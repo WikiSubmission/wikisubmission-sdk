@@ -70,6 +70,7 @@ type QuranData = z.infer<typeof WikiSubmission.Quran.V1.Schemas.QuranData>;
 
 * Complete API coverage
 * Expand package for other WikiSubmission services
+* Integrate across existing services (site, bots, apps etc.)
 * Framework specific utilities (e.g., Next.js)
 * Improved query parsing
 
