@@ -1,5 +1,6 @@
 import { WikiSubmissionAPIClient } from "../core/api-client";
 import { QuranV1APIClient } from "./v1/api-client";
+import { QuranV1Constants } from "./v1/constants";
 import { QuranV1Methods } from "./v1/methods";
 import { QuranV1Schemas } from "./v1/schemas";
 
@@ -10,6 +11,7 @@ export class Quran {
     },
     Methods: QuranV1Methods,
     Schemas: QuranV1Schemas,
+    Constants: QuranV1Constants,
   };
 
   static Credits = [
