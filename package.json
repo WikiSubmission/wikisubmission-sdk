@@ -1,0 +1,62 @@
+{
+  "name": "wikisubmission-sdk",
+  "version": "1.0.0",
+  "description": "WikiSubmission SDK",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "rimraf lib && tsc",
+    "lint": "eslint . --ext .ts && npm run format:check",
+    "test": "rimraf lib && jest --config jestconfig.json",
+    "playground": "rimraf lib && tsc && node lib/__tests__/playground.js",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags",
+    "check-updates": "npx npm-check-updates",
+    "check-updates:minor": "npx npm-check-updates --target minor",
+    "check-updates:patch": "npx npm-check-updates --target patch",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wikisubmission/wikisubmission-sdk.git"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "keywords": [
+    "wikisubmission",
+    "wikisubmission-sdk"
+  ],
+  "author": "WikiSubmission",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wikisubmission/wikisubmission-sdk/issues"
+  },
+  "homepage": "https://github.com/wikisubmission/wikisubmission-sdk#readme",
+  "devDependencies": {
+    "@types/jest": "^29.4.0",
+    "@types/node": "^18.19.120",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "ansi-regex": ">=6.0.1",
+    "eslint": "^8.33.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.4.1",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.0.5",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "zod": "^3.25.76"
+  }
+}
