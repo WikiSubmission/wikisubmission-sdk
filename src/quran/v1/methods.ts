@@ -16,7 +16,7 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "chapter",
-          query: query,
+          query,
           indices: chapterResult,
           options: parsedOptions,
           metadata: {
@@ -30,7 +30,7 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "verse",
-          query: query,
+          query,
           indices: [
             {
               ...verseResult,
@@ -48,7 +48,7 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "verse_range",
-          query: query,
+          query,
           indices: verseRangeResult,
           options: parsedOptions,
           metadata: {
@@ -62,7 +62,7 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "multiple_verses",
-          query: query,
+          query,
           indices: multipleVersesResult,
           options: parsedOptions,
           metadata: {
@@ -76,11 +76,11 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "random_chapter",
-          query: query,
+          query,
           indices: [],
           options: parsedOptions,
           metadata: {
-            title: `Random Chapter`,
+            title: "Random Chapter",
           },
         };
       }
@@ -90,11 +90,11 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "random_verse",
-          query: query,
+          query,
           indices: [],
           options: parsedOptions,
           metadata: {
-            title: `Random Verse`,
+            title: "Random Verse",
           },
         };
       }
@@ -104,7 +104,7 @@ export class QuranV1Methods {
         return {
           valid: true,
           type: "search",
-          query: query,
+          query,
           indices: [],
           options: parsedOptions,
           metadata: {
@@ -126,11 +126,11 @@ export class QuranV1Methods {
           }
 
           if (query === "random-verse") {
-            return `Random Verse`;
+            return "Random Verse";
           }
 
           if (query === "random-chapter") {
-            return `Random Chapter`;
+            return "Random Chapter";
           }
 
           if (query.startsWith("data:") && query.length > 5) {
@@ -189,7 +189,9 @@ export class QuranV1Methods {
   private static chapterOnlyMatch = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
-    if (!query) return null;
+    if (!query) {
+      return null;
+    }
     let possibleCh: string | null = null;
     if (query.startsWith("chapter:")) {
       possibleCh = query?.split("chapter:")?.[1];
@@ -213,19 +215,25 @@ export class QuranV1Methods {
   private static verseMatch = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex> | null => {
-    if (!query) return null;
+    if (!query) {
+      return null;
+    }
     const match = VerseIndices.find(i => {
       return `${i.chapter}:${i.verse}` === query;
     });
-    return match ? match : null;
+    return match || null;
   };
 
   private static verseRangeMatch = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
-    if (!query) return null;
+    if (!query) {
+      return null;
+    }
 
-    if (!query.includes("-") || query.endsWith("-")) return null;
+    if (!query.includes("-") || query.endsWith("-")) {
+      return null;
+    }
 
     const match = VerseIndices.filter(i => {
       const queryCh = Number(query.split(":")?.[0]);
@@ -246,11 +254,15 @@ export class QuranV1Methods {
   private static multipleVersesMatch = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
-    if (!query) return null;
+    if (!query) {
+      return null;
+    }
 
-    if (!query.includes(",")) return null;
+    if (!query.includes(",")) {
+      return null;
+    }
 
-    let results: z.infer<typeof QuranV1Schemas.VerseIndex>[] = [];
+    const results: z.infer<typeof QuranV1Schemas.VerseIndex>[] = [];
     for (const component of query.split(",")) {
       const basis = component.trim();
 
@@ -270,7 +282,9 @@ export class QuranV1Methods {
   };
 
   private static randomChapterMatch = (query?: string): boolean => {
-    if (!query) return false;
+    if (!query) {
+      return false;
+    }
     return (
       query?.toLowerCase().includes("random") &&
       query?.toLowerCase().includes("chapter")
@@ -278,7 +292,9 @@ export class QuranV1Methods {
   };
 
   private static randomVerseMatch = (query?: string): boolean => {
-    if (!query) return false;
+    if (!query) {
+      return false;
+    }
     return (
       query?.toLowerCase().includes("random") &&
       query?.toLowerCase().includes("verse")
@@ -286,18 +302,25 @@ export class QuranV1Methods {
   };
 
   private static searchMatch = (query: string): boolean => {
-    if (!query || typeof query !== "string") return false;
+    if (!query || typeof query !== "string") {
+      return false;
+    }
 
     // Trim whitespace
     const trimmedQuery = query.trim();
-    if (!trimmedQuery) return false;
+    if (!trimmedQuery) {
+      return false;
+    }
 
     // If query contains only numbers, colons, commas, hyphens, or whitespace, it's likely a verse reference, not a search
-    if (/^[\d:,\-\s]+$/.test(trimmedQuery)) return false;
+    if (/^[\d:,\-\s]+$/.test(trimmedQuery)) {
+      return false;
+    }
 
     // If query is very short (1-2 chars) and doesn't contain letters, probably not a search
-    if (trimmedQuery.length <= 2 && !/[a-zA-Z]/.test(trimmedQuery))
+    if (trimmedQuery.length <= 2 && !/[a-zA-Z]/.test(trimmedQuery)) {
       return false;
+    }
 
     // Must contain at least one alphabetic character to be considered a search query
     return /[a-zA-Z]/.test(trimmedQuery);

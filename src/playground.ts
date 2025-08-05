@@ -1,4 +1,4 @@
-import { WikiSubmission } from "../";
+import { WikiSubmission } from "./index";
 
 // [Run this file with `npm run playground`]
 
@@ -8,7 +8,7 @@ import { WikiSubmission } from "../";
     enableRequestLogging: true,
     enableCaching: true,
   });
-  
+
   // Run query
   const query = await ws.query("nineteen", {
     search_apply_highlight: true,
@@ -18,10 +18,8 @@ import { WikiSubmission } from "../";
   // Handle error
   if (query instanceof WikiSubmission.Error) {
     console.log(`[${query.name}] ${query.message}`);
-  }
-
-  // Result!
-  else {
+  } else {
+    // Result!
     console.log("--------------------------------");
     console.log(query.request);
     console.log("--------------------------------");

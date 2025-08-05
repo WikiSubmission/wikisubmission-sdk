@@ -159,7 +159,7 @@ export class QuranV1APIClient extends WikiSubmissionAPIClient {
     | APIResponse<z.infer<typeof QuranV1Schemas.QuranData>[]>
     | WikiSubmissionAPIError
   > {
-    return this.query(`verse-of-the-day`, queryOptions, apiClientOptions);
+    return this.query("verse-of-the-day", queryOptions, apiClientOptions);
   }
 
   /**
@@ -172,7 +172,7 @@ export class QuranV1APIClient extends WikiSubmissionAPIClient {
     | APIResponse<z.infer<typeof QuranV1Schemas.QuranData>[]>
     | WikiSubmissionAPIError
   > {
-    return this.query(`chapter-of-the-day`, queryOptions, apiClientOptions);
+    return this.query("chapter-of-the-day", queryOptions, apiClientOptions);
   }
 
   /**

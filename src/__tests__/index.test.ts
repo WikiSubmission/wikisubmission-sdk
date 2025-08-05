@@ -1,4 +1,6 @@
 import { WikiSubmission } from "../index";
+import { WikiSubmissionAPIError } from "../core/api-client-types";
+// fail is available globally in Jest
 
 describe("WikiSubmission SDK", () => {
   let ws: any;
@@ -189,13 +191,9 @@ describe("WikiSubmission SDK", () => {
 
   describe("Error Handling", () => {
     test("should handle invalid queries", async () => {
-      try {
-        await ws.query(""); // Empty query should be invalid
-        fail("Should have thrown an error");
-      } catch (error: unknown) {
-        expect(error).toBeInstanceOf(WikiSubmission.Error);
-        expect((error as any).message).toBeDefined();
-      }
+      const result = await ws.query(""); // Empty query should be invalid
+      expect(result).toBeInstanceOf(WikiSubmissionAPIError);
+      expect((result as WikiSubmissionAPIError).message).toBeDefined();
     });
 
     test("should handle network errors gracefully", async () => {
@@ -227,7 +225,7 @@ describe("WikiSubmission SDK", () => {
       expect(results.length).toBe(3);
 
       for (const result of results) {
-        if (!(result instanceof WikiSubmission.Error)) {
+        if (!(result instanceof WikiSubmissionAPIError)) {
           expect(result.response).toBeDefined();
           expect(Array.isArray(result.response)).toBe(true);
         }
