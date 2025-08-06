@@ -10,6 +10,7 @@ export class QuranV1Schemas {
   static SupportedLanguages = z.enum([
     "english",
     "arabic",
+    "transliterated",
     "turkish",
     "french",
     "german",
