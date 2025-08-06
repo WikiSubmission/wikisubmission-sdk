@@ -67,6 +67,7 @@ export class QuranV1Schemas {
   static QuranData = z.object({
     // Indices
     verse_id: z.string(),
+    verse_id_arabic: z.string(),
     chapter_number: z.number(),
     verse_number: z.number(),
     verse_index: z.number(),
