@@ -64,7 +64,7 @@ describe("WikiSubmission SDK", () => {
 
     test("should get random verse with options", async () => {
       const query = await ws.getRandomVerse({
-        include_language: "swedish,turkish",
+        include_language: ["swedish", "turkish"],
         normalize_god_casing: true,
       });
 
@@ -148,7 +148,7 @@ describe("WikiSubmission SDK", () => {
     test("should get verse range", async () => {
       const query = await ws.query("1:1-3", {
         include_word_by_word: true,
-        include_language: "swedish",
+        include_language: ["swedish"],
       });
 
       expect(query).toBeDefined();
@@ -213,9 +213,9 @@ describe("WikiSubmission SDK", () => {
   describe("Batch Queries", () => {
     test("should handle batch queries", async () => {
       const queries = [
-        { query: "1:1", options: { include_language: "english" } },
-        { query: "1:2", options: { include_language: "english" } },
-        { query: "1:3", options: { include_language: "english" } },
+        { query: "1:1", options: { include_language: ["english"] } },
+        { query: "1:2", options: { include_language: ["english"] } },
+        { query: "1:3", options: { include_language: ["english"] } },
       ];
 
       const results = await ws.batchQuery(queries);
