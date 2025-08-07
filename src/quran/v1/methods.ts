@@ -1,7 +1,6 @@
 import z from "zod";
 import { QuranV1Schemas } from "./schemas";
 import { VerseIndices } from "../../data/verse-indices";
-import { WikiSubmissionAPIError } from "../../core/api-client-types";
 
 export class QuranV1Methods {
   /**
