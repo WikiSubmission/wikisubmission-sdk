@@ -232,7 +232,7 @@ export class QuranV1Methods {
 
       if (options?.includeSubtitles && i.verse_subtitle_english) {
         verseParts.push(
-          `${options?.includeMarkdownFormatting ? "\`" : ""}${QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language)}${options?.includeMarkdownFormatting ? "\`" : ""}`
+          `${options?.includeMarkdownFormatting ? "`" : ""}${QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language)}${options?.includeMarkdownFormatting ? "`" : ""}`
         );
       }
 
