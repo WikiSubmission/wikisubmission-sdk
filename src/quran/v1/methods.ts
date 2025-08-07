@@ -212,7 +212,7 @@ export class QuranV1Methods {
   /**
    * Returns an array of verse text strings in a readable format, with options to further add markdown, subtitles, footnotes, transliteration, and other languages.
    */
-  static formatDataToVerseText(
+  static formatDataToText(
     data: z.infer<typeof QuranV1Schemas.QuranData>[],
     language: z.infer<typeof QuranV1Schemas.SupportedLanguages>,
     options?: Partial<{
