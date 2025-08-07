@@ -1,8 +1,12 @@
 import z from "zod";
 import { QuranV1Schemas } from "./schemas";
 import { VerseIndices } from "../../data/verse-indices";
+import { WikiSubmissionAPIError } from "../../core/api-client-types";
 
 export class QuranV1Methods {
+  /**
+   * Parses a query string into a structured query object.
+   */
   static parseQuery = (
     query: string,
     options?: Partial<z.infer<typeof QuranV1Schemas.QueryOptions>>
@@ -10,7 +14,7 @@ export class QuranV1Methods {
     const parsedOptions = QuranV1Schemas.QueryOptions.parse(options || {});
 
     try {
-      const chapterResult = this.chapterOnlyMatch(query);
+      const chapterResult = this.isChapterType(query);
 
       if (chapterResult) {
         return {
@@ -25,7 +29,7 @@ export class QuranV1Methods {
         };
       }
 
-      const verseResult = this.verseMatch(query);
+      const verseResult = this.isVerseType(query);
       if (verseResult) {
         return {
           valid: true,
@@ -43,7 +47,7 @@ export class QuranV1Methods {
         };
       }
 
-      const verseRangeResult = this.verseRangeMatch(query);
+      const verseRangeResult = this.isVerseRangeType(query);
       if (verseRangeResult) {
         return {
           valid: true,
@@ -57,7 +61,7 @@ export class QuranV1Methods {
         };
       }
 
-      const multipleVersesResult = this.multipleVersesMatch(query);
+      const multipleVersesResult = this.isMultipleVersesType(query);
       if (multipleVersesResult) {
         return {
           valid: true,
@@ -71,7 +75,7 @@ export class QuranV1Methods {
         };
       }
 
-      const randomChapterResult = this.randomChapterMatch(query);
+      const randomChapterResult = this.isRandomChapterType(query);
       if (randomChapterResult) {
         return {
           valid: true,
@@ -85,7 +89,7 @@ export class QuranV1Methods {
         };
       }
 
-      const randomVerseResult = this.randomVerseMatch(query);
+      const randomVerseResult = this.isRandomVerseType(query);
       if (randomVerseResult) {
         return {
           valid: true,
@@ -99,7 +103,7 @@ export class QuranV1Methods {
         };
       }
 
-      const searchResult = this.searchMatch(query);
+      const searchResult = this.isSearchType(query);
       if (searchResult) {
         return {
           valid: true,
@@ -154,7 +158,10 @@ export class QuranV1Methods {
     }
   };
 
-  static resolveLanguage = (
+  /**
+   * Resolves a comma separated list of languages into a list of supported languages.
+   */
+  static resolveLanguageQuery = (
     input: string
   ): z.infer<typeof QuranV1Schemas.SupportedLanguages>[] => {
     const languages = input.split(",").map(lang => lang.trim().toLowerCase());
@@ -174,19 +181,229 @@ export class QuranV1Methods {
   };
 
   /**
-   *
-   *
-   *
-   *
-   * INTERNAL
-   *
-   *
-   *
-   *
-   *
+   * Returns a readable, language appropriate chapter title (e.g. Chapter 1, The Key) given a dataset.
+   * If there are multiple chapters, it will return "Multiple Chapters".
    */
+  static formatDataToChapterTitle(
+    data: z.infer<typeof QuranV1Schemas.QuranData>[],
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>,
+    useSuraAsPrefix: boolean = false
+  ): string {
+    if (data.every(i => i.chapter_number !== data[0].chapter_number)) {
+      return "Multiple Chapters";
+    } else {
+      return `${useSuraAsPrefix ? "Sura" : "Chapter"} ${data[0].chapter_number} (${QuranV1Methods.getTitlePropertyForLanguage(data[0], language)})`;
+    }
+  }
 
-  private static chapterOnlyMatch = (
+  /**
+   * Returns a language appropriate verse ID (e.g. 1:1 vs ١:١).
+   */
+  static formatDataToVerseId(
+    data: z.infer<typeof QuranV1Schemas.QuranData>,
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string {
+    if (language === "arabic" || language === "persian") {
+      return `${data.verse_id_arabic}`;
+    }
+
+    return `${data.verse_id}`;
+  }
+
+  /**
+   * Returns an array of verse text strings.
+   */
+  static formatDataToVerseText(
+    data: z.infer<typeof QuranV1Schemas.QuranData>[],
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>,
+    options?: Partial<{
+      includeMarkdownFormatting: boolean;
+      includeArabic: boolean;
+      includeSubtitles: boolean;
+      includeFootnotes: boolean;
+      includeTransliteration: boolean;
+      includeOtherLanguages: z.infer<
+        typeof QuranV1Schemas.SupportedLanguages
+      >[];
+    }>
+  ): string[] {
+    const verses: string[] = [];
+    for (const i of data) {
+      const verseParts: string[] = [];
+
+      if (options?.includeSubtitles && i.verse_subtitle_english) {
+        verseParts.push(
+          `${options?.includeMarkdownFormatting ? "\`" : ""}${QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language)}${options?.includeMarkdownFormatting ? "\`" : ""}`
+        );
+      }
+
+      verseParts.push(
+        `${options?.includeMarkdownFormatting ? "**" : ""}[${QuranV1Methods.formatDataToVerseId(i, language)}]${options?.includeMarkdownFormatting ? "**" : ""} ${QuranV1Methods.getVerseTextPropertyForLanguage(i, language)}`
+      );
+
+      if (options?.includeOtherLanguages) {
+        for (const lang of options.includeOtherLanguages) {
+          if (i[`verse_text_${lang}`]) {
+            verseParts.push(
+              `${options?.includeMarkdownFormatting ? "**" : ""}[${QuranV1Methods.formatDataToVerseId(i, language)}]${options?.includeMarkdownFormatting ? "**" : ""} ${i[`verse_text_${lang}`]}`
+            );
+          }
+        }
+      }
+
+      if (options?.includeArabic && i.verse_text_arabic) {
+        verseParts.push(`${i.verse_text_arabic}`);
+      }
+
+      if (options?.includeFootnotes && i.verse_footnote_english) {
+        verseParts.push(
+          `${options?.includeMarkdownFormatting ? "*" : ""}${QuranV1Methods.getVerseFootnotesPropertyForLanguage(i, language)}${options?.includeMarkdownFormatting ? "*" : ""}`
+        );
+      }
+
+      if (options?.includeTransliteration && i.verse_text_transliterated) {
+        verseParts.push(`${i.verse_text_transliterated}`);
+      }
+
+      verses.push(verseParts.join("\n\n"));
+    }
+
+    return verses;
+  }
+
+  static getBookTitle(
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string {
+    switch (language) {
+      case "english":
+        return "Quran: The Final Testament";
+      case "arabic":
+        return "Quran: The Final Testament";
+      case "persian":
+        return "Quran: The Final Testament • Persian";
+      case "turkish":
+        return "Kuran: Son Ahit • Turkish";
+      case "french":
+        return "Quran: Le Testament Final • French";
+      case "german":
+        return "Koranen: Det Sista Testamentet • Swedish";
+      case "bahasa":
+        return "Quran: The Final Testament • Bahasa";
+      case "tamil":
+        return "Quran: The Final Testament இறுதி வேதம் • Tamil";
+      case "swedish":
+        return "Koranen: Det Sista Testamentet • Swedish";
+      case "russian":
+        return "Коран: Последний Завет • Russian";
+      default:
+        return "Quran: The Final Testament";
+    }
+  }
+
+  /**
+   * Returns the appropriate `chapter_title_{language}` property (defaults to English).
+   */
+  static getTitlePropertyForLanguage(
+    data: z.infer<typeof QuranV1Schemas.QuranData>,
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string {
+    if (language === "english") {
+      return data.chapter_title_english;
+    } else if (language === "turkish") {
+      return data.chapter_title_turkish || data.chapter_title_english;
+    } else if (language === "french") {
+      return data.chapter_title_french || data.chapter_title_english;
+    } else if (language === "german") {
+      return data.chapter_title_german || data.chapter_title_english;
+    } else if (language === "bahasa") {
+      return data.chapter_title_bahasa || data.chapter_title_english;
+    } else if (language === "persian") {
+      return data.chapter_title_persian || data.chapter_title_english;
+    } else if (language === "tamil") {
+      return data.chapter_title_tamil || data.chapter_title_english;
+    } else if (language === "swedish") {
+      return data.chapter_title_swedish || data.chapter_title_english;
+    } else if (language === "russian") {
+      return data.chapter_title_russian || data.chapter_title_english;
+    } else {
+      return data.chapter_title_english || "--";
+    }
+  }
+
+  /**
+   * Returns the appropriate `verse_text_{language}` property (defaults to English).
+   */
+  static getVerseTextPropertyForLanguage(
+    data: z.infer<typeof QuranV1Schemas.QuranData>,
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string {
+    if (language === "english") {
+      return data.verse_text_english;
+    } else if (language === "turkish") {
+      return data.verse_text_turkish || data.verse_text_english;
+    } else if (language === "french") {
+      return data.verse_text_french || data.verse_text_english;
+    } else if (language === "german") {
+      return data.verse_text_german || data.verse_text_english;
+    } else if (language === "bahasa") {
+      return data.verse_text_bahasa || data.verse_text_english;
+    } else if (language === "persian") {
+      return data.verse_text_persian || data.verse_text_english;
+    } else if (language === "tamil") {
+      return data.verse_text_tamil || data.verse_text_english;
+    } else if (language === "swedish") {
+      return data.verse_text_swedish || data.verse_text_english;
+    } else if (language === "russian") {
+      return data.verse_text_russian || data.verse_text_english;
+    } else {
+      return data.verse_text_english || "--";
+    }
+  }
+
+  /**
+   * Returns the appropriate `verse_subtitle_{language}` property (defaults to English).
+   */
+  static getVerseSubtitlePropertyForLanguage(
+    data: z.infer<typeof QuranV1Schemas.QuranData>,
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string | null {
+    if (language === "english") {
+      return data.verse_subtitle_english || null;
+    } else {
+      const subtitleKey = `verse_subtitle_${language}` as keyof z.infer<
+        typeof QuranV1Schemas.QuranData
+      >;
+      if (subtitleKey in data && data[subtitleKey]) {
+        return data[subtitleKey] as string | null;
+      }
+      return data.verse_subtitle_english || null;
+    }
+  }
+
+  /**
+   * Returns the appropriate `verse_footnote_{language}` property (defaults to English).
+   */
+  static getVerseFootnotesPropertyForLanguage(
+    data: z.infer<typeof QuranV1Schemas.QuranData>,
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
+  ): string | null {
+    if (language === "english") {
+      return data.verse_footnote_english || null;
+    } else {
+      const footnoteKey = `verse_footnote_${language}` as keyof z.infer<
+        typeof QuranV1Schemas.QuranData
+      >;
+      if (footnoteKey in data && data[footnoteKey]) {
+        return data[footnoteKey] as string | null;
+      }
+      return data.verse_footnote_english || null;
+    }
+  }
+
+  /**
+   * Checks query for a chapter request and returns precomputed indices for the chapter (null otherwise).
+   */
+  static isChapterType = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
     if (!query) {
@@ -212,7 +429,10 @@ export class QuranV1Methods {
     return null;
   };
 
-  private static verseMatch = (
+  /**
+   * Checks query for a verse request and returns precomputed index for the verse (null otherwise).
+   */
+  static isVerseType = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex> | null => {
     if (!query) {
@@ -224,7 +444,10 @@ export class QuranV1Methods {
     return match || null;
   };
 
-  private static verseRangeMatch = (
+  /**
+   * Checks query for a verse range request and returns precomputed indices for the range (null otherwise).
+   */
+  static isVerseRangeType = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
     if (!query) {
@@ -251,7 +474,10 @@ export class QuranV1Methods {
     return null;
   };
 
-  private static multipleVersesMatch = (
+  /**
+   * Checks query for a multiple verses request and returns precomputed indices for the verses (null otherwise).
+   */
+  static isMultipleVersesType = (
     query?: string
   ): z.infer<typeof QuranV1Schemas.VerseIndex>[] | null => {
     if (!query) {
@@ -267,12 +493,12 @@ export class QuranV1Methods {
       const basis = component.trim();
 
       // [Use existing functions to detect verse in component]
-      const singleMatch = this.verseMatch(basis);
+      const singleMatch = this.isVerseType(basis);
       if (singleMatch) {
         results.push(singleMatch);
         continue;
       }
-      const rangeMatch = this.verseRangeMatch(basis);
+      const rangeMatch = this.isVerseRangeType(basis);
       if (rangeMatch) {
         results.push(...rangeMatch);
       }
@@ -281,7 +507,10 @@ export class QuranV1Methods {
     return results.length > 0 ? results : null;
   };
 
-  private static randomChapterMatch = (query?: string): boolean => {
+  /**
+   * Checks query for a random chapter request and returns true if the query is a random chapter request (false otherwise).
+   */
+  static isRandomChapterType = (query?: string): boolean => {
     if (!query) {
       return false;
     }
@@ -291,7 +520,10 @@ export class QuranV1Methods {
     );
   };
 
-  private static randomVerseMatch = (query?: string): boolean => {
+  /**
+   * Checks query for a random verse request and returns true if the query is a random verse request (false otherwise).
+   */
+  static isRandomVerseType = (query?: string): boolean => {
     if (!query) {
       return false;
     }
@@ -301,7 +533,10 @@ export class QuranV1Methods {
     );
   };
 
-  private static searchMatch = (query: string): boolean => {
+  /**
+   * Checks query for a search request and returns true if the query is a search request (false otherwise).
+   */
+  static isSearchType = (query: string): boolean => {
     if (!query || typeof query !== "string") {
       return false;
     }
