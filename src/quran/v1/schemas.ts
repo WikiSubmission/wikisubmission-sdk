@@ -38,7 +38,7 @@ export class QuranV1Schemas {
         .default("verse_index"),
       normalize_god_casing: z.boolean().default(false),
       include_word_by_word: z.boolean().default(false),
-      include_language: z.string().default("none"),
+      include_language: z.array(QuranV1Schemas.SupportedLanguages).default([]),
       // Search-specific options
       search_strategy: z.enum(["exact", "fuzzy"]).default("fuzzy"),
       search_language: QuranV1Schemas.SupportedLanguages.default("english"),
