@@ -280,7 +280,10 @@ export class QuranV1Methods {
         verseParts.push(`${i.verse_text_transliterated}`);
       }
 
-      verses.push(verseParts.filter(i => i.length > 0).join("\n\n"));
+      const filteredVerseParts = verseParts.filter(i => i.length > 0);
+      if (filteredVerseParts.length > 0) {
+        verses.push(filteredVerseParts.join("\n\n"));
+      }
     }
 
     return verses;
