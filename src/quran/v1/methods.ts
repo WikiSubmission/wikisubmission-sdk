@@ -271,6 +271,9 @@ export class QuranV1Methods {
     return verses;
   }
 
+  /**
+   * Returns the appropriate book title for the language.
+   */
   static getBookTitle(
     language: z.infer<typeof QuranV1Schemas.SupportedLanguages>
   ): string {
