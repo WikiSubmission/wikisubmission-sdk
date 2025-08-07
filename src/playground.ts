@@ -127,7 +127,7 @@ import { WikiSubmission } from "./index";
   // Example: Get formatted verse text with markdown
   // const formattedResult = await ws.query("1:1-3");
   // if (!(formattedResult instanceof WikiSubmission.Error)) {
-  //   const formattedText = WikiSubmission.Quran.V1.Methods.formatDataToVerseText(
+  //   const formattedText = WikiSubmission.Quran.V1.Methods.formatDataToText(
   //     formattedResult.response,
   //     "english",
   //     {
@@ -273,7 +273,7 @@ import { WikiSubmission } from "./index";
   // Example: Verse text formatting
   // const customFormatResult = await ws.query("1:1-3");
   // if (!(customFormatResult instanceof WikiSubmission.Error)) {
-  //   const customFormatted = WikiSubmission.Quran.V1.Methods.formatDataToVerseText(
+  //   const customFormatted = WikiSubmission.Quran.V1.Methods.formatDataToText(
   //     customFormatResult.response,
   //     "english",
   //     {
