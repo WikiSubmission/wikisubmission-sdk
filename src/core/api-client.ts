@@ -72,11 +72,17 @@ export abstract class WikiSubmissionAPIClient {
           });
         }
 
+        // Convert array parameters to comma-separated strings (e.g. ['turkish', 'french'] -> 'turkish,french').
+        const processedParams = { ...params };
+        Object.entries(processedParams).forEach(([key, value]) => {
+          if (Array.isArray(value)) processedParams[key] = value.join(",");
+        });
+
         // Make request
         const response = await this.axiosInstance.request({
           method,
           url,
-          params,
+          params: processedParams,
           timeout: this.config.timeoutMs,
           cancelToken: cancelTokenSource.token,
         });
