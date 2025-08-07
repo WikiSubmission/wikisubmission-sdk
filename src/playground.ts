@@ -145,7 +145,7 @@ import { WikiSubmission } from "./index";
 
   // Example: Get chapter title
   // const chapterTitleResult = await ws.query("1:2-3", {
-  //   include_language: "turkish"
+  //   include_language: ["turkish"]
   // });
   // if (!(chapterTitleResult instanceof WikiSubmission.Error)) {
   //   const title = WikiSubmission.Quran.V1.Methods.formatDataToChapterTitle(
