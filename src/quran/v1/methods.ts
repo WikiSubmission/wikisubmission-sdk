@@ -232,23 +232,20 @@ export class QuranV1Methods {
       const verseParts: string[] = [];
 
       if (options?.includeSubtitles && i.verse_subtitle_english) {
-        const subtitle = options?.includeMarkdownFormatting
-          ? QuranV1Methods.processMarkdown(
-              QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language)
-            )
-          : QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language) ||
-            "";
+        const subtitle = QuranV1Methods.getVerseSubtitlePropertyForLanguage(
+          i,
+          language
+        );
         verseParts.push(
           `${options?.includeMarkdownFormatting ? "`" : ""}${subtitle}${options?.includeMarkdownFormatting ? "`" : ""}`
         );
       }
 
       if (!options?.removeMainText) {
-        const verseText = options?.includeMarkdownFormatting
-          ? QuranV1Methods.processMarkdown(
-              QuranV1Methods.getVerseTextPropertyForLanguage(i, language)
-            )
-          : QuranV1Methods.getVerseTextPropertyForLanguage(i, language) || "";
+        const verseText = QuranV1Methods.getVerseTextPropertyForLanguage(
+          i,
+          language
+        );
         verseParts.push(
           `${options?.includeMarkdownFormatting ? "**" : ""}[${QuranV1Methods.formatDataToVerseId(i, language)}]${options?.includeMarkdownFormatting ? "**" : ""} ${verseText}`
         );
@@ -257,11 +254,7 @@ export class QuranV1Methods {
       if (options?.includeOtherLanguages) {
         for (const lang of options.includeOtherLanguages) {
           if (i[`verse_text_${lang}`]) {
-            const otherLangText = options?.includeMarkdownFormatting
-              ? QuranV1Methods.processMarkdown(
-                  i[`verse_text_${lang}`] as string
-                )
-              : (i[`verse_text_${lang}`] as string) || "";
+            const otherLangText = i[`verse_text_${lang}`];
             verseParts.push(
               `${options?.includeMarkdownFormatting ? "**" : ""}[${QuranV1Methods.formatDataToVerseId(i, language)}]${options?.includeMarkdownFormatting ? "**" : ""} ${otherLangText}`
             );
@@ -274,12 +267,10 @@ export class QuranV1Methods {
       }
 
       if (options?.includeFootnotes && i.verse_footnote_english) {
-        const footnote = options?.includeMarkdownFormatting
-          ? QuranV1Methods.processMarkdown(
-              QuranV1Methods.getVerseFootnotesPropertyForLanguage(i, language)
-            )
-          : QuranV1Methods.getVerseFootnotesPropertyForLanguage(i, language) ||
-            "";
+        const footnote = QuranV1Methods.getVerseFootnotesPropertyForLanguage(
+          i,
+          language
+        );
         verseParts.push(
           `${options?.includeMarkdownFormatting ? "*" : ""}${footnote}${options?.includeMarkdownFormatting ? "*" : ""}`
         );
@@ -289,7 +280,7 @@ export class QuranV1Methods {
         verseParts.push(`${i.verse_text_transliterated}`);
       }
 
-      verses.push(verseParts.join("\n\n"));
+      verses.push(verseParts.filter(i => i.length > 0).join("\n\n"));
     }
 
     return verses;
@@ -587,11 +578,4 @@ export class QuranV1Methods {
     // Must contain at least one alphabetic character to be considered a search query
     return /[a-zA-Z]/.test(trimmedQuery);
   };
-
-  /**
-   * Process text for markdown compatibility by replacing asterisks with ±
-   */
-  static processMarkdown(text: string | null | undefined): string {
-    return text?.replace(/\*/g, "±") || "";
-  }
 }
