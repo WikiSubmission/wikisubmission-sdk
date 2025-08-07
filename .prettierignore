@@ -2,6 +2,7 @@
 lib/
 dist/
 build/
+src/data/
 
 # Dependencies
 node_modules/
