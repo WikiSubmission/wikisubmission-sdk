@@ -27,5 +27,6 @@ module.exports = {
     "dist/",
     "coverage/",
     "node_modules/",
+    "src/playground.ts"
   ],
 }; 
