@@ -13,6 +13,8 @@ export abstract class WikiSubmissionAPIClient {
   protected readonly activeRequests: Map<string, CancelTokenSource> = new Map();
   private cacheCleanupInterval?: NodeJS.Timeout;
 
+  public Error = WikiSubmission.Error;
+
   constructor(config: APIConfig) {
     this.config = {
       baseURL: config.baseURL || "",
