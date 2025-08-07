@@ -188,10 +188,10 @@ export class QuranV1Methods {
     language: z.infer<typeof QuranV1Schemas.SupportedLanguages>,
     useSuraAsPrefix: boolean = false
   ): string {
-    if (data.every(i => i.chapter_number !== data[0].chapter_number)) {
-      return "Multiple Chapters";
+    if (data.every(i => i.chapter_number === data?.[0]?.chapter_number)) {
+      return `${useSuraAsPrefix ? "Sura" : "Chapter"} ${data[0].chapter_number} (${QuranV1Methods.getTitlePropertyForLanguage(data[0], language)})`;
     } else {
-      return `${useSuraAsPrefix ? "Sura" : "Chapter"} ${data[0].chapter_number}, ${QuranV1Methods.getTitlePropertyForLanguage(data[0], language)}`;
+      return "Multiple Chapters";
     }
   }
 
