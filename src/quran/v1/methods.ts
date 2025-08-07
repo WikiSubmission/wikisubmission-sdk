@@ -189,7 +189,7 @@ export class QuranV1Methods {
     useSuraAsPrefix: boolean = false
   ): string {
     if (data.every(i => i.chapter_number === data?.[0]?.chapter_number)) {
-      return `${useSuraAsPrefix ? "Sura" : "Chapter"} ${data[0].chapter_number} (${QuranV1Methods.getTitlePropertyForLanguage(data[0], language)})`;
+      return `${useSuraAsPrefix ? "Sura" : "Chapter"} ${data[0].chapter_number}, ${QuranV1Methods.getTitlePropertyForLanguage(data[0], language)}`;
     } else {
       return "Multiple Chapters";
     }
