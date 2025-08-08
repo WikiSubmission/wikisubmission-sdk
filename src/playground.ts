@@ -125,7 +125,7 @@ import { WikiSubmission } from "./index";
   // ========================================
 
   // Example: Get formatted verse text with markdown
-  const formattedResult = await ws.query("2:1-20", {
+  const formattedResult = await ws.query("55", {
     search_language: "english",
     include_language: ["english"],
   });
@@ -135,10 +135,11 @@ import { WikiSubmission } from "./index";
       "english",
       {
         includeMarkdownFormatting: true,
-        includeArabic: true,
-        includeSubtitles: true,
+        includeArabic: false,
+        includeSubtitles: false,
         includeFootnotes: true,
-        includeTransliteration: true,
+        includeTransliteration: false,
+        removeMainText: true,
       }
     );
     console.log("Formatted Verse Text:");
