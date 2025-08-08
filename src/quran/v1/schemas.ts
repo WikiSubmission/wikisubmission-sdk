@@ -193,6 +193,8 @@ export class QuranV1Schemas {
 
     chapter_title_arabic: z.string(),
     chapter_title_transliterated: z.string(),
+    chapter_revelation_order: z.number(),
+    verse_text_arabic_clean: z.string(),
   });
 
   static QuranAudioLinkData = z.object({
