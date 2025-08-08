@@ -25,7 +25,10 @@ export class QuranV1APIClient extends WikiSubmissionAPIClient {
     query: string,
     queryOptions?: Partial<z.infer<typeof QuranV1Schemas.QueryOptions>>,
     apiClientOptions: APIClientOptions = {}
-  ): Promise<APIResponse<T> | WikiSubmissionAPIError> {
+  ): Promise<
+    | APIResponse<T, z.infer<typeof QuranV1Schemas.ParsedQuery>>
+    | WikiSubmissionAPIError
+  > {
     // Parse query
     const parsedQuery = QuranV1Methods.parseQuery(query, queryOptions);
     if (!parsedQuery.valid) {
@@ -89,14 +92,19 @@ export class QuranV1APIClient extends WikiSubmissionAPIClient {
   /**
    * Batch query multiple requests (simplified)
    */
-  async batchQuery(
+  async batchQuery<T = z.infer<typeof QuranV1Schemas.QuranData>[]>(
     queries: Array<{
       query: string;
       options?: any;
       apiClientOptions?: APIClientOptions;
     }>,
     concurrency: number = 3
-  ): Promise<Array<APIResponse | WikiSubmissionAPIError>> {
+  ): Promise<
+    Array<
+      | APIResponse<T, z.infer<typeof QuranV1Schemas.ParsedQuery>>
+      | WikiSubmissionAPIError
+    >
+  > {
     const results: Array<APIResponse | WikiSubmissionAPIError> = [];
 
     // Process in batches

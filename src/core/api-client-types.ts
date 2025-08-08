@@ -9,9 +9,9 @@ export interface APIConfig {
   enableRequestLogging?: boolean;
 }
 
-export interface APIResponse<T = any> {
+export interface APIResponse<T = any, X = any> {
   id: string;
-  request: any;
+  request: X;
   response: T;
 }
 

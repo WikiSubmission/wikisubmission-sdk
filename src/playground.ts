@@ -125,27 +125,27 @@ import { WikiSubmission } from "./index";
   // ========================================
 
   // Example: Get formatted verse text with markdown
-  const formattedResult = await ws.query("55", {
-    search_language: "english",
-    include_language: ["english"],
-  });
-  if (!(formattedResult instanceof WikiSubmission.Error)) {
-    const formattedText = WikiSubmission.Quran.V1.Methods.formatDataToText(
-      formattedResult.response,
-      "english",
-      {
-        includeMarkdownFormatting: true,
-        includeArabic: false,
-        includeSubtitles: false,
-        includeFootnotes: true,
-        includeTransliteration: false,
-        removeMainText: true,
-      }
-    );
-    console.log("Formatted Verse Text:");
-    console.log(formattedText.join("\n\n"));
-    console.log("\n");
-  }
+  // const formattedResult = await ws.query("55", {
+  //   search_language: "english",
+  //   include_language: ["english"],
+  // });
+  // if (!(formattedResult instanceof WikiSubmission.Error)) {
+  //   const formattedText = WikiSubmission.Quran.V1.Methods.formatDataToText(
+  //     formattedResult.response,
+  //     "english",
+  //     {
+  //       includeMarkdownFormatting: true,
+  //       includeArabic: false,
+  //       includeSubtitles: false,
+  //       includeFootnotes: true,
+  //       includeTransliteration: false,
+  //       removeMainText: true,
+  //     }
+  //   );
+  //   console.log("Formatted Verse Text:");
+  //   console.log(formattedText.join("\n\n"));
+  //   console.log("\n");
+  // }
 
   // Example: Get chapter title
   // const chapterTitleResult = await ws.query("1:2-3", {
@@ -213,7 +213,9 @@ import { WikiSubmission } from "./index";
   //   { query: "2:255" },
   //   { query: "3:8" },
   //   { query: "nineteen" },
-  // ], 2);
+  //   { query: "dsfsdfsdfsd" },
+  //   { query: "555" },
+  // ]);
   // console.log("Batch Query Results:");
   // console.log(batchResult);
   // console.log("\n");
