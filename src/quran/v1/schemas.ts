@@ -73,9 +73,7 @@ export class QuranV1Schemas {
     verse_number: z.number(),
     verse_index: z.number(),
     verse_index_numbered: z.number().optional(),
-    // Arabic text
-    verse_text_arabic: z.string(),
-    verse_text_transliterated: z.string(),
+    chapter_revelation_order: z.number(),
     // Chapter title
     chapter_title_english: z.string(),
     chapter_title_turkish: z.string().optional(),
@@ -86,6 +84,8 @@ export class QuranV1Schemas {
     chapter_title_tamil: z.string().optional(),
     chapter_title_swedish: z.string().optional(),
     chapter_title_russian: z.string().optional(),
+    chapter_title_arabic: z.string(),
+    chapter_title_transliterated: z.string(),
     // Word by word
     word_by_word: z.array(
       z.object({
@@ -107,6 +107,9 @@ export class QuranV1Schemas {
     verse_text_tamil: z.string().optional(),
     verse_text_swedish: z.string().optional(),
     verse_text_russian: z.string().optional(),
+    verse_text_arabic: z.string(),
+    verse_text_arabic_clean: z.string(),
+    verse_text_transliterated: z.string(),
     // Verse subtitle
     verse_subtitle_english: z.string().optional(),
     verse_subtitle_turkish: z.string().optional(),
@@ -190,11 +193,6 @@ export class QuranV1Schemas {
     verse_subtitle_tamil: z.string().optional(),
     verse_footnote_tamil: z.string().optional(),
     chapter_title_tamil: z.string(),
-
-    chapter_title_arabic: z.string(),
-    chapter_title_transliterated: z.string(),
-    chapter_revelation_order: z.number(),
-    verse_text_arabic_clean: z.string(),
   });
 
   static QuranAudioLinkData = z.object({
