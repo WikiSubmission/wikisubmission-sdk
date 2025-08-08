@@ -190,6 +190,9 @@ export class QuranV1Schemas {
     verse_subtitle_tamil: z.string().optional(),
     verse_footnote_tamil: z.string().optional(),
     chapter_title_tamil: z.string(),
+
+    chapter_title_arabic: z.string(),
+    chapter_title_transliterated: z.string(),
   });
 
   static QuranAudioLinkData = z.object({
@@ -197,5 +200,11 @@ export class QuranV1Schemas {
     mishary: z.string(),
     basit: z.string(),
     minshawi: z.string(),
+  });
+
+  static QuranAPIResponse = z.object({
+    id: z.string(),
+    request: QuranV1Schemas.ParsedQuery,
+    response: z.array(QuranV1Schemas.QuranData),
   });
 }
