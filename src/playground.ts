@@ -296,5 +296,30 @@ import { WikiSubmission } from "./index";
   //   console.log("\n");
   // }
 
+  // Example: Structured verse text formatting
+  // const structuredFormatResult = await ws.query("2:1-3", {
+  //   include_language: ["turkish", "french"],
+  // });
+  // if (!(structuredFormatResult instanceof WikiSubmission.Error)) {
+  //   const structuredFormatted =
+  //     WikiSubmission.Quran.V1.Methods.formatDataToStructuredText(
+  //       structuredFormatResult.response,
+  //       "english",
+  //       {
+  //         verseSubtitle: true,
+  //         verseId: true,
+  //         verseText: true,
+  //         verseArabic: true,
+  //         verseForeignLanguageTexts: ["turkish", "french"],
+  //         verseTransliteration: true,
+  //         verseFootnotes: true,
+  //         markdownFormatting: true,
+  //       }
+  //     );
+  //   console.log("Structured Formatted Verses:");
+  //   console.log(structuredFormatted);
+  //   console.log("\n");
+  // }
+
   console.log("✅ Playground completed!");
 })();

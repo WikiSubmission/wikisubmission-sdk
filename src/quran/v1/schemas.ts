@@ -202,6 +202,26 @@ export class QuranV1Schemas {
     minshawi: z.string(),
   });
 
+  static StructuredVerseText = z.object({
+    verseSubtitle: z.string().nullable(),
+    verseId: z.string().nullable(),
+    verseText: z.string().nullable(),
+    verseArabic: z.string().nullable(),
+    verseForeignLanguageTexts: z
+      .record(
+        QuranV1Schemas.SupportedLanguages,
+        z.object({
+          verseSubtitle: z.string().nullable(),
+          verseId: z.string().nullable(),
+          verseText: z.string().nullable(),
+          verseFootnotes: z.string().nullable(),
+        })
+      )
+      .nullable(),
+    verseTransliteration: z.string().nullable(),
+    verseFootnotes: z.string().nullable(),
+  });
+
   static QuranAPIPayload = z.object({
     id: z.string(),
     request: QuranV1Schemas.ParsedQuery,

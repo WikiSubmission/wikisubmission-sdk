@@ -209,6 +209,122 @@ export class QuranV1Methods {
     return `${data.verse_id}`;
   }
 
+  static formatDataToStructuredText(
+    data: z.infer<typeof QuranV1Schemas.QuranData>[],
+    language: z.infer<typeof QuranV1Schemas.SupportedLanguages>,
+    include: Partial<{
+      verseSubtitle: boolean;
+      verseId: boolean;
+      verseText: boolean;
+      verseArabic: boolean;
+      verseForeignLanguageTexts: z.infer<
+        typeof QuranV1Schemas.SupportedLanguages
+      >[];
+      verseTransliteration: boolean;
+      verseFootnotes: boolean;
+      markdownFormatting: boolean;
+    }>
+  ): z.infer<typeof QuranV1Schemas.StructuredVerseText>[] {
+    const output: z.infer<typeof QuranV1Schemas.StructuredVerseText>[] = [];
+
+    for (const i of data) {
+      const structuredVerse: z.infer<
+        typeof QuranV1Schemas.StructuredVerseText
+      > = {
+        verseSubtitle: include.verseSubtitle
+          ? (() => {
+              const subtitle =
+                QuranV1Methods.getVerseSubtitlePropertyForLanguage(i, language);
+              return subtitle && (include.markdownFormatting ?? false)
+                ? `\`${subtitle}\``
+                : subtitle;
+            })()
+          : null,
+        verseId: include.verseId
+          ? (() => {
+              const verseId = QuranV1Methods.formatDataToVerseId(i, language);
+              return (include.markdownFormatting ?? false)
+                ? `**${verseId}**`
+                : verseId;
+            })()
+          : null,
+        verseText: include.verseText
+          ? QuranV1Methods.getVerseTextPropertyForLanguage(i, language)
+          : null,
+        verseArabic: include.verseArabic ? i.verse_text_arabic : null,
+        verseForeignLanguageTexts:
+          include.verseForeignLanguageTexts &&
+          include.verseForeignLanguageTexts.length > 0
+            ? include.verseForeignLanguageTexts.reduce(
+                (acc, lang) => {
+                  const textKey = `verse_text_${lang}` as keyof z.infer<
+                    typeof QuranV1Schemas.QuranData
+                  >;
+                  const subtitleKey = `verse_subtitle_${lang}` as keyof z.infer<
+                    typeof QuranV1Schemas.QuranData
+                  >;
+                  const footnoteKey = `verse_footnote_${lang}` as keyof z.infer<
+                    typeof QuranV1Schemas.QuranData
+                  >;
+
+                  const verseText = (i[textKey] as string) || null;
+                  const subtitle = (i[subtitleKey] as string) || null;
+                  const footnote = (i[footnoteKey] as string) || null;
+
+                  if (verseText) {
+                    acc[lang] = {
+                      verseSubtitle:
+                        subtitle && (include.markdownFormatting ?? false)
+                          ? `\`${subtitle}\``
+                          : subtitle,
+                      verseId:
+                        (include.markdownFormatting ?? false)
+                          ? `**${QuranV1Methods.formatDataToVerseId(i, lang)}**`
+                          : QuranV1Methods.formatDataToVerseId(i, lang),
+                      verseText: verseText,
+                      verseFootnotes:
+                        footnote && (include.markdownFormatting ?? false)
+                          ? `**${footnote}**`
+                          : footnote,
+                    };
+                  }
+
+                  return acc;
+                },
+                {} as Record<
+                  z.infer<typeof QuranV1Schemas.SupportedLanguages>,
+                  {
+                    verseSubtitle: string | null;
+                    verseId: string;
+                    verseText: string;
+                    verseFootnotes: string | null;
+                  }
+                >
+              )
+            : null,
+        verseTransliteration: include.verseTransliteration
+          ? i.verse_text_transliterated
+          : null,
+        verseFootnotes: include.verseFootnotes
+          ? (() => {
+              const footnote =
+                QuranV1Methods.getVerseFootnotesPropertyForLanguage(
+                  i,
+                  language
+                );
+              return footnote && (include.markdownFormatting ?? false)
+                ? `**${footnote}**`
+                : footnote;
+            })()
+          : null,
+      };
+
+      output.push(structuredVerse);
+    }
+
+    return output;
+  }
+
   /**
    * Returns an array of verse text strings in a readable format, with options to further add markdown, subtitles, footnotes, transliteration, and other languages.
    */
