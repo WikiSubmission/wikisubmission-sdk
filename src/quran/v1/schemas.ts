@@ -204,7 +204,7 @@ export class QuranV1Schemas {
     minshawi: z.string(),
   });
 
-  static QuranAPIResponse = z.object({
+  static QuranAPIPayload = z.object({
     id: z.string(),
     request: QuranV1Schemas.ParsedQuery,
     response: z.array(QuranV1Schemas.QuranData),
